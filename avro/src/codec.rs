@@ -105,6 +105,7 @@ impl Codec {
             }
             #[cfg(feature = "zstandard")]
             Codec::Zstandard(settings) => {
+                use zstd::zstd_safe;
                 let mut dst = Vec::with_capacity(zstd_safe::compress_bound(stream.len()));
                 zstd_safe::compress(
                     &mut dst,

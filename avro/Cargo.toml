@@ -33,7 +33,7 @@ bzip = ["dep:bzip2"]
 derive = ["dep:apache-avro-derive"]
 snappy = ["dep:crc32fast", "dep:snap"]
 xz = ["dep:xz2"]
-zstandard = ["dep:zstd", "dep:zstd-safe"]
+zstandard = ["dep:zstd"]
 default = ["zstandard"]
 
 [lib]
@@ -74,8 +74,6 @@ thiserror = { default-features = false, version = "2.0.12" }
 uuid = { default-features = false, version = "1.16.0", features = ["serde", "std"] }
 xz2 = { default-features = false, version = "0.1.7", optional = true }
 zstd = { default-features = false, version = "0.13.3", optional = true }
-zstd-safe = { default-features = false, version = "7.2.1", optional = true }
-
 
 [target.'cfg(target_arch = "wasm32")'.dependencies]
 quad-rand = { default-features = false, version = "0.2.3" }

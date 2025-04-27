@@ -80,7 +80,6 @@ dependencies = [
  "uuid",
  "xz2",
  "zstd",
- "zstd-safe",
 ]
 
 [[package]]
