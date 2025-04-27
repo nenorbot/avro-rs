@@ -105,11 +105,14 @@ impl Codec {
             }
             #[cfg(feature = "zstandard")]
             Codec::Zstandard(settings) => {
-                use std::io::Write;
-                let mut encoder =
-                    zstd::Encoder::new(Vec::new(), settings.compression_level as i32).unwrap();
-                encoder.write_all(stream).map_err(Error::ZstdCompress)?;
-                *stream = encoder.finish().unwrap();
+                let mut dst = Vec::with_capacity(zstd_safe::compress_bound(stream.len()));
+                zstd_safe::compress(
+                    &mut dst,
+                    stream,
+                    settings.compression_level as zstd_safe::CompressionLevel,
+                )
+                .expect("compress_bound too low");
+                *stream = dst;
             }
             #[cfg(feature = "bzip")]
             Codec::Bzip2(settings) => {
