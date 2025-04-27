@@ -51,6 +51,8 @@ pub struct Writer<'a, W: Write> {
     has_header: bool,
     #[builder(default)]
     user_metadata: HashMap<String, Value>,
+    #[builder(skip = Vec::with_capacity(block_size))]
+    buffer2: Vec<u8>,
 }
 
 impl<'a, W: Write> Writer<'a, W> {
@@ -320,7 +322,7 @@ impl<'a, W: Write> Writer<'a, W> {
             return Ok(0);
         }
 
-        self.codec.compress(&mut self.buffer)?;
+        self.codec.compress(&mut self.buffer, &mut self.buffer2)?;
 
         let num_values = self.num_values;
         let stream_len = self.buffer.len();

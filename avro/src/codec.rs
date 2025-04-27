@@ -78,7 +78,7 @@ impl From<Codec> for Value {
 
 impl Codec {
     /// Compress a stream of bytes in-place.
-    pub fn compress(self, stream: &mut Vec<u8>) -> AvroResult<()> {
+    pub fn compress(self, stream: &mut Vec<u8>, compressed_stream: &mut Vec<u8>) -> AvroResult<()> {
         match self {
             Codec::Null => (),
             Codec::Deflate(settings) => {
@@ -106,14 +106,17 @@ impl Codec {
             #[cfg(feature = "zstandard")]
             Codec::Zstandard(settings) => {
                 use zstd::zstd_safe;
-                let mut dst = Vec::with_capacity(zstd_safe::compress_bound(stream.len()));
+                assert!(compressed_stream.is_empty());
+                let bound = zstd_safe::compress_bound(stream.len());
+                compressed_stream.reserve(bound);
                 zstd_safe::compress(
-                    &mut dst,
+                    compressed_stream,
                     stream,
                     settings.compression_level as zstd_safe::CompressionLevel,
                 )
-                .expect("compress_bound too low");
-                *stream = dst;
+                .expect("buffer too low");
+                std::mem::swap(stream, compressed_stream);
+                compressed_stream.clear();
             }
             #[cfg(feature = "bzip")]
             Codec::Bzip2(settings) => {
